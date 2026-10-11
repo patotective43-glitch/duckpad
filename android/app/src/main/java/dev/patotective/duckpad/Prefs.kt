@@ -79,7 +79,34 @@ class Prefs(context: Context) {
 
     val activeIdentity get() = identity(activeSlot)
 
+    /** 0 = sigue al sistema, 1 = claro, 2 = oscuro. Solo afecta a la pantalla principal: el mando es siempre oscuro. */
+    var theme: Int
+        get() = sp.getInt("theme", 0).coerceIn(0, 2)
+        set(v) = sp.edit().putInt("theme", v.coerceIn(0, 2)).apply()
+
+    /** Zona muerta de los sticks en porcentaje del recorrido. */
+    var deadZone: Int
+        get() = sp.getInt("dead_zone", 5).coerceIn(0, MAX_DEAD_ZONE)
+        set(v) = sp.edit().putInt("dead_zone", v.coerceIn(0, MAX_DEAD_ZONE)).apply()
+
+    /** Respuesta cuadrática: más precisión cerca del centro, el mismo tope. */
+    var fineCenter: Boolean
+        get() = sp.getBoolean("fine_center", false)
+        set(v) = sp.edit().putBoolean("fine_center", v).apply()
+
+    /** Lo que va detrás de «DuckPad» en el nombre Bluetooth, para distinguir varios aparatos en el mismo PC. */
+    var nameSuffix: String?
+        get() = sp.getString("name_suffix", null)
+        set(v) = sp.edit().putString("name_suffix", v).apply()
+
+    /** Solo en versiones de depuración: inglés y «PC» en vez del nombre del ordenador, para las capturas de la tienda. */
+    var demo: Boolean
+        get() = sp.getBoolean("demo", false)
+        set(v) = sp.edit().putBoolean("demo", v).apply()
+
     companion object {
+        const val MAX_DEAD_ZONE = 20
+        const val MAX_SUFFIX = 16
         // PID de pruebas privadas de pid.codes: no es único y no puede salir en una versión publicada.
         val DEFAULT = Identity(0x1209, 0x0001, 0x0100)
     }

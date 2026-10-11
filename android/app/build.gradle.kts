@@ -10,6 +10,11 @@ val signingFile = rootProject.file(System.getenv("DUCKPAD_SIGNING") ?: "../../du
 val signing = Properties().apply { if (signingFile.exists()) signingFile.inputStream().use { load(it) } }
 
 android {
+    // Los textos pesan poco: con todos los idiomas en el APK, el idioma por app de Android 13 y el modo demo
+    // funcionan sin descargar nada de Play.
+    bundle {
+        language { enableSplit = false }
+    }
     useLibrary("android.test.runner")
     useLibrary("android.test.base")
     useLibrary("android.test.mock")

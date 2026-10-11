@@ -14,12 +14,17 @@ import android.view.WindowInsetsController
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.window.OnBackInvokedDispatcher
 
 /** Editor de posiciones: no arranca el Bluetooth ni manda nada al PC. */
 class LayoutActivity : Activity() {
     private lateinit var pad: GamepadView
     private lateinit var bar: LinearLayout
+    private lateinit var sizeRow: LinearLayout
+    private lateinit var sizeLabel: TextView
+
+    override fun attachBaseContext(newBase: android.content.Context) = super.attachBaseContext(Look.wrap(newBase, themed = false))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,9 +37,10 @@ class LayoutActivity : Activity() {
             status = getString(R.string.layout_hint)
             // La barra se aparta mientras se arrastra, por si el control pasa por debajo.
             onDragging = { dragging -> bar.animate().alpha(if (dragging) 0f else 1f).setDuration(120).start() }
+            onSelectionChanged = { scale -> showSize(scale) }
         }
         bar = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
+            orientation = LinearLayout.VERTICAL
             background = GradientDrawable().apply {
                 setColor(GamepadView.SURFACE)
                 setStroke((1 * d).toInt(), GamepadView.BORDER)
@@ -42,7 +48,16 @@ class LayoutActivity : Activity() {
             }
             setPadding((4 * d).toInt(), 0, (4 * d).toInt(), 0)
         }
-        fun action(label: Int, color: Int, bold: Boolean = false, onClick: () -> Unit) = Button(this, null, 0, android.R.style.Widget_Material_Button_Borderless).apply {
+        val actions = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        // Segunda fila, solo con un control elegido: el tamaño no cabe al lado de las acciones en un móvil en vertical.
+        sizeRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            visibility = View.GONE
+        }
+        bar.addView(actions)
+        bar.addView(sizeRow, LinearLayout.LayoutParams(-1, -2))
+        fun action(label: Int, color: Int, bold: Boolean = false, row: LinearLayout = actions, onClick: () -> Unit) = Button(this, null, 0, android.R.style.Widget_Material_Button_Borderless).apply {
             setText(label)
             isAllCaps = false
             textSize = 14f
@@ -55,7 +70,7 @@ class LayoutActivity : Activity() {
             minimumHeight = minHeight
             setPadding((12 * d).toInt(), 0, (12 * d).toInt(), 0)
             setOnClickListener { onClick() }
-            bar.addView(this)
+            row.addView(this)
         }
         action(R.string.layout_cancel, GamepadView.LABEL) { confirmDiscard() }
         action(R.string.layout_reset, GamepadView.LABEL) {
@@ -71,6 +86,18 @@ class LayoutActivity : Activity() {
             params.gravity = Gravity.CENTER_HORIZONTAL or if (atTop) Gravity.BOTTOM else Gravity.TOP
             bar.layoutParams = params
         }.apply { contentDescription = getString(R.string.move_toolbar) }
+        action(R.string.size_smaller, GamepadView.LABEL, bold = true, row = sizeRow) { pad.stepSelected(-1) }
+            .apply { contentDescription = getString(R.string.size_smaller_a11y); minWidth = (48 * d).toInt(); textSize = 22f }
+        sizeLabel = TextView(this).apply {
+            setTextColor(GamepadView.LABEL)
+            textSize = 14f
+            gravity = Gravity.CENTER
+            minWidth = (96 * d).toInt()
+            accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+            sizeRow.addView(this)
+        }
+        action(R.string.size_bigger, GamepadView.LABEL, bold = true, row = sizeRow) { pad.stepSelected(1) }
+            .apply { contentDescription = getString(R.string.size_bigger_a11y); minWidth = (48 * d).toInt(); textSize = 22f }
 
         val margin = (8 * d).toInt()
         val root = FrameLayout(this)
@@ -100,6 +127,11 @@ class LayoutActivity : Activity() {
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
         }
+    }
+
+    private fun showSize(scale: Float?) {
+        sizeRow.visibility = if (scale == null) View.GONE else View.VISIBLE
+        if (scale != null) sizeLabel.text = getString(R.string.size_value, Math.round(scale * 100))
     }
 
     @Deprecated("Android 12 o anterior; desde Android 13 el gesto llega por OnBackInvokedCallback.")

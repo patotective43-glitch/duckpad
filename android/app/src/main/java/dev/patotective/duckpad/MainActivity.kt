@@ -4,12 +4,16 @@ import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.WindowInsets
 import android.widget.*
@@ -28,10 +32,18 @@ class MainActivity : Activity() {
     private val tick = object : Runnable {
         override fun run() { updateSession(); main.postDelayed(this, 500) }
     }
+    override fun attachBaseContext(newBase: Context) = super.attachBaseContext(Look.wrap(newBase, themed = true))
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         prefs = Prefs(this)
+        // finish() dentro de onCreate se salta onStart: la actividad nueva arranca ya con el idioma del modo demo.
+        if (applyDemoExtra()) {
+            finish()
+            startActivity(Intent(this, MainActivity::class.java))
+            return
+        }
+        setContentView(R.layout.activity_main)
         status = findViewById(R.id.session_status)
         start = findViewById(R.id.session_start)
         action = findViewById(R.id.session_action)
@@ -71,8 +83,75 @@ class MainActivity : Activity() {
         }
         toggle.setOnClickListener { stepsOpen = !stepsOpen; showSteps() }
         showSteps()
+        bindTheme()
+        bindSticks()
+        bindName()
         bindIdentity(savedInstanceState)
         applyInsets()
+    }
+
+    /**
+     * Capturas de la tienda, solo en depuración: `am start -n …/.MainActivity --ez demo true` pone la app en inglés
+     * y oculta el nombre del PC; `--ez demo false` lo quita.
+     */
+    private fun applyDemoExtra(): Boolean {
+        if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE == 0 || !intent.hasExtra("demo")) return false
+        val on = intent.getBooleanExtra("demo", false)
+        intent.removeExtra("demo")
+        if (prefs.demo == on) return false
+        prefs.demo = on
+        return true
+    }
+
+    private fun bindTheme() {
+        val ids = listOf(R.id.theme_system, R.id.theme_light, R.id.theme_dark)
+        findViewById<RadioGroup>(R.id.theme).apply {
+            check(ids[prefs.theme])
+            setOnCheckedChangeListener { _, id ->
+                val theme = ids.indexOf(id)
+                if (theme < 0 || theme == prefs.theme) return@setOnCheckedChangeListener
+                prefs.theme = theme
+                recreate()
+            }
+        }
+    }
+
+    private fun bindSticks() {
+        val label = findViewById<TextView>(R.id.dead_zone_label)
+        val bar = findViewById<SeekBar>(R.id.dead_zone)
+        // TalkBack leería el progreso como porcentaje de la barra (5 de 20 = 25 %): se le da el valor real.
+        fun show(v: Int) {
+            label.text = getString(R.string.dead_zone_label, v)
+            if (Build.VERSION.SDK_INT >= 30) bar.stateDescription = getString(R.string.percent, v)
+        }
+        bar.apply {
+            max = Prefs.MAX_DEAD_ZONE
+            progress = prefs.deadZone
+            show(progress)
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(bar: SeekBar, value: Int, fromUser: Boolean) {
+                    show(value)
+                    if (fromUser) prefs.deadZone = value
+                }
+                override fun onStartTrackingTouch(bar: SeekBar) = Unit
+                override fun onStopTrackingTouch(bar: SeekBar) = Unit
+            })
+        }
+        findViewById<Switch>(R.id.fine_center).apply {
+            isChecked = prefs.fineCenter
+            setOnCheckedChangeListener { _, on -> prefs.fineCenter = on }
+        }
+    }
+
+    private fun bindName() {
+        findViewById<EditText>(R.id.name_suffix).apply {
+            setText(Look.suffix(this@MainActivity))
+            addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+                override fun afterTextChanged(s: Editable?) { prefs.nameSuffix = s.toString().trim() }
+            })
+        }
     }
     private fun bindIdentity(saved: Bundle?) {
         advancedOpen = saved?.getBoolean("advanced_open") ?: false
@@ -170,7 +249,7 @@ class MainActivity : Activity() {
         val message = when {
             !granted -> getString(R.string.bt_state_no_permission)
             !enabled -> getString(R.string.bt_state_off)
-            BlePad.sessionOpen && BlePad.inputReady -> getString(R.string.session_connected, BlePad.connectedName ?: "PC")
+            BlePad.sessionOpen && BlePad.inputReady -> getString(R.string.session_connected, Look.hostName(this, BlePad.connectedName))
             BlePad.sessionOpen && BlePad.connectionUnconfirmed -> getString(R.string.status_ble_generic)
             BlePad.sessionOpen && BlePad.linked -> getString(R.string.status_ble_checking)
             BlePad.sessionOpen && BlePad.pcLostController() -> getString(R.string.status_ble_lost)
@@ -205,6 +284,7 @@ class MainActivity : Activity() {
         // El servidor GATT ya publicó su identidad: cambiarla con él abierto no llegaría a Windows.
         val identityEditable = !BlePad.sessionOpen && BlePad.idle
         identityFields.forEach { it.isEnabled = identityEditable }
+        findViewById<View>(R.id.name_suffix).isEnabled = identityEditable
         listOf(R.id.identity_slot_a, R.id.identity_slot_b).forEach { findViewById<View>(it).isEnabled = identityEditable }
         findViewById<View>(R.id.identity_save).isEnabled = identityEditable
         findViewById<View>(R.id.identity_reset).isEnabled = identityEditable

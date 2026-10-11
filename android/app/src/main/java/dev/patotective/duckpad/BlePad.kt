@@ -371,7 +371,7 @@ object BlePad {
         // (0x0006 = Microsoft; 03 = baliza, 00 = emparejar solo por LE, 80 = byte de RSSI reservado, y
         // el nombre que sale en el aviso). Windows no hace escaneo activo: todo va en el paquete principal,
         // por eso el nombre del móvil se manda en la respuesta de escaneo.
-        val swiftPair = byteArrayOf(0x03, 0x00, 0x80.toByte()) + PAD_NAME.toByteArray()
+        val swiftPair = byteArrayOf(0x03, 0x00, 0x80.toByte()) + swiftPairName(Look.padName(app))
         val data = AdvertiseData.Builder()
             .addServiceUuid(ParcelUuid(HID_UUID))
             .addManufacturerData(MICROSOFT_ID, swiftPair)
@@ -441,14 +441,24 @@ object BlePad {
 
     /**
      * Windows lista el móvil con el nombre que se anuncia, y el móvil ya sale una vez por Bluetooth clásico.
-     * Durante la sesión el móvil se llama «DuckPad» para distinguir la entrada del mando; se devuelve el nombre al salir.
+     * Durante la sesión el móvil se llama «DuckPad» y el nombre del aparato, para distinguir la entrada del mando y
+     * varios móviles en el mismo PC; se devuelve el nombre al salir.
      */
     private fun useShortName() {
         val adapter = app.getSystemService(BluetoothManager::class.java)?.adapter ?: return
         val current = adapter.name
-        if (current == PAD_NAME) return
-        Prefs(app).originalName = current
-        if (adapter.setName(PAD_NAME)) renamedAt = SystemClock.uptimeMillis()
+        val wanted = Look.padName(app)
+        if (current == wanted) return
+        // Tras un cierre brusco el móvil puede seguir llamándose DuckPad: ese no es su nombre de verdad.
+        if (current?.startsWith(Look.PAD_NAME) != true) Prefs(app).originalName = current
+        if (adapter.setName(wanted)) renamedAt = SystemClock.uptimeMillis()
+    }
+
+    /** El paquete de anuncio tiene 31 bytes y al nombre de Swift Pair le quedan 17; se corta sin partir un carácter. */
+    private fun swiftPairName(name: String): ByteArray {
+        var cut = name
+        while (cut.toByteArray().size > SWIFT_PAIR_NAME_MAX) cut = cut.dropLast(1)
+        return cut.trimEnd().toByteArray()
     }
 
     @SuppressLint("MissingPermission")
@@ -702,7 +712,7 @@ object BlePad {
 
     private fun deviceInformationService(id: Identity) =
         BluetoothGattService(uuid16(0x180A), BluetoothGattService.SERVICE_TYPE_PRIMARY).apply {
-            addCharacteristic(readable(0x2A29, PAD_NAME.toByteArray()))
+            addCharacteristic(readable(0x2A29, Look.PAD_NAME.toByteArray()))
             // PnP ID: origen 02 (VID del USB-IF) y luego VID, PID y versión en little-endian.
             val pnp = ByteBuffer.allocate(7).order(ByteOrder.LITTLE_ENDIAN)
                 .put(0x02).putShort(id.vid.toShort()).putShort(id.pid.toShort()).putShort(id.version.toShort()).array()
@@ -808,7 +818,7 @@ object BlePad {
     private const val QUICK_DROP_MS = 1500L
     private const val QUICK_DROPS_FOR_STALE = 3
     private const val MICROSOFT_ID = 0x0006
-    private const val PAD_NAME = "DuckPad"
+    private const val SWIFT_PAIR_NAME_MAX = 17
 }
 
 /**

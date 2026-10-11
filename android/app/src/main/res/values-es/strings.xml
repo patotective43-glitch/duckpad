@@ -25,7 +25,7 @@
     <string name="steps_hide">Ocultar los pasos</string>
     <string name="setup_1">1. Toca Iniciar sesión en este móvil.</string>
     <string name="setup_2">2. En el PC, pulsa Conectar en el aviso de DuckPad. Si no sale, abre Configuración &gt; Bluetooth y dispositivos &gt; Agregar dispositivo &gt; Bluetooth.</string>
-    <string name="setup_3">3. Salen dos DuckPad. Elige el del icono de dos dispositivos, no el del teléfono. El orden de la lista puede cambiar.</string>
+    <string name="setup_3">3. Salen dos entradas que empiezan por DuckPad. Elige el del icono de dos dispositivos, no el del teléfono. El orden de la lista puede cambiar.</string>
     <string name="choose_device">Este</string>
     <string name="avoid_phone">Este no</string>
     <string name="guide_accessibility">En la lista de Windows, elige DuckPad con el icono de dos dispositivos, no el que tiene icono de teléfono.</string>
@@ -94,9 +94,25 @@
     <string name="layout_reset">Restablecer</string>
     <string name="layout_cancel">Cancelar</string>
     <string name="layout_move_bar">Mover</string>
-    <string name="layout_hint">Arrastra los controles donde quieras</string>
+    <string name="layout_hint">Arrastra para mover. Toca un control y pellizca o usa − + para cambiar su tamaño</string>
     <string name="layout_discard">¿Descartar los cambios de posición?</string>
     <string name="layout_discard_ok">Descartar</string>
     <string name="layout_reset_confirm">¿Volver a la distribución inicial?</string>
     <string name="move_toolbar">Mover la barra al otro borde</string>
+
+    <string name="size_smaller_a11y">Hacer más pequeño</string>
+    <string name="size_bigger_a11y">Hacer más grande</string>
+    <string name="size_value">Tamaño %1$d %%</string>
+
+    <string name="dead_zone_name">Zona muerta de los sticks</string>
+    <string name="percent">%1$d %%</string>
+    <string name="dead_zone_label">Zona muerta de los sticks: %1$d %%</string>
+    <string name="fine_center">Más precisión cerca del centro</string>
+    <string name="sticks_help">La zona muerta ignora los movimientos pequeños del pulgar. Con más precisión, los movimientos cortos giran menos y al empujar a fondo se sigue llegando al tope. Un stick más grande en Colocar controles también da más recorrido.</string>
+    <string name="theme_label">Tema</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="name_label">Nombre en el PC</string>
+    <string name="name_help">Sirve para distinguir varios móviles en la configuración Bluetooth de Windows. Windows recoge el nombre nuevo la próxima vez que se conecta el mando.</string>
 </resources>

@@ -36,6 +36,8 @@ class ControllerActivity : Activity(), BlePad.Listener {
     private var acquired = false
     private var rumbling = false
 
+    override fun attachBaseContext(newBase: Context) = super.attachBaseContext(Look.wrap(newBase, themed = false))
+
     private val statusTick = object : Runnable {
         override fun run() {
             updateStatus()
@@ -194,7 +196,7 @@ class ControllerActivity : Activity(), BlePad.Listener {
             } else {
                 // Los pasos se pliegan cuando Windows ya acepta los informes del mando, no con cualquier conexión.
                 if (!prefs.connectedOnce) prefs.connectedOnce = true
-                pad.status = getString(R.string.status_bt_connected, BlePad.connectedName ?: "PC")
+                pad.status = getString(R.string.status_bt_connected, Look.hostName(this, BlePad.connectedName))
                 pad.statusIsError = false
             }
             BlePad.State.FAILED -> {

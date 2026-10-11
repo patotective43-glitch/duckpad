@@ -26,7 +26,7 @@
     <string name="steps_hide">Hide the steps</string>
     <string name="setup_1">1. Tap Start session on this phone.</string>
     <string name="setup_2">2. On the PC, click Connect in the DuckPad notification. If it doesn\'t show up, open Settings &gt; Bluetooth &amp; devices &gt; Add device &gt; Bluetooth.</string>
-    <string name="setup_3">3. Two DuckPad entries show up. Choose the one with the two-device icon, not the phone. The order in the list may change.</string>
+    <string name="setup_3">3. Two entries starting with DuckPad show up. Choose the one with the two-device icon, not the phone. The order in the list may change.</string>
     <string name="choose_device">This one</string>
     <string name="avoid_phone">Not this one</string>
     <string name="guide_accessibility">In the Windows list, choose DuckPad with the two-device icon, not the one with the phone icon.</string>
@@ -98,9 +98,27 @@
     <string name="layout_reset">Reset</string>
     <string name="layout_cancel">Cancel</string>
     <string name="layout_move_bar">Move</string>
-    <string name="layout_hint">Drag the controls where you want them</string>
+    <string name="layout_hint">Drag to move. Tap a control, then pinch or use − + to resize</string>
     <string name="layout_discard">Discard layout changes?</string>
     <string name="layout_discard_ok">Discard</string>
     <string name="layout_reset_confirm">Restore the default layout?</string>
     <string name="move_toolbar">Move toolbar to the other edge</string>
+
+    <string name="size_smaller" translatable="false">−</string>
+    <string name="size_bigger" translatable="false">+</string>
+    <string name="size_smaller_a11y">Make smaller</string>
+    <string name="size_bigger_a11y">Make bigger</string>
+    <string name="size_value">Size %1$d%%</string>
+
+    <string name="dead_zone_name">Stick dead zone</string>
+    <string name="percent">%1$d%%</string>
+    <string name="dead_zone_label">Stick dead zone: %1$d%%</string>
+    <string name="fine_center">Finer control near the center</string>
+    <string name="sticks_help">The dead zone ignores small thumb movements. With finer control, small movements turn less and a full push still reaches the edge. A bigger stick in Arrange controls also gives more travel.</string>
+    <string name="theme_label">Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="name_label">Name on the PC</string>
+    <string name="name_help">Tells several phones apart in Windows Bluetooth settings. Windows picks up a new name the next time the controller connects.</string>
 </resources>

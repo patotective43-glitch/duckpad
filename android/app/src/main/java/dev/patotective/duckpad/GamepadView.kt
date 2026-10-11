@@ -130,6 +130,20 @@ class GamepadView(context: Context) : View(context) {
     private var positions = mutableMapOf<Int, Pair<Float, Float>>()
     private val l3 = Button("L3", Buttons.LEFT_THUMB, LABEL, round = true)
     private val r3 = Button("R3", Buttons.RIGHT_THUMB, LABEL, round = true)
+    private val controlCount get() = buttons.size + 3
+
+    // Tamaño de cada control respecto al de la distribución por defecto, que se guarda en baseW/baseH.
+    private val scales = mutableMapOf<Int, Float>()
+    private val baseW = FloatArray(CONTROLS)
+    private val baseH = FloatArray(CONTROLS)
+    private var selected = -1
+    private var pinchSpan = 0f
+    private var pinchScale = 1f
+    /** Control elegido en el editor y su tamaño; null si no hay ninguno. */
+    var onSelectionChanged: ((Float?) -> Unit)? = null
+
+    private var deadZone = 0f
+    private var fineCenter = false
 
     private var unit = 1f
     private var slop = 0f
@@ -154,30 +168,101 @@ class GamepadView(context: Context) : View(context) {
         isHapticFeedbackEnabled = false
         keepScreenOn = true
         loadPositions()
+        loadTuning()
     }
 
     private fun loadPositions() {
         positions.clear()
-        for (i in 0 until 16) {
+        scales.clear()
+        for (i in 0 until CONTROLS) {
             if (layoutPrefs.contains("x$i")) positions[i] = layoutPrefs.getFloat("x$i", .5f) to layoutPrefs.getFloat("y$i", .5f)
+            if (layoutPrefs.contains("s$i")) scales[i] = layoutPrefs.getFloat("s$i", 1f).coerceIn(MIN_SCALE, MAX_SCALE)
         }
+    }
+
+    private fun loadTuning() {
+        val prefs = Prefs(context)
+        deadZone = prefs.deadZone / 100f
+        fineCenter = prefs.fineCenter
     }
 
     fun reloadLayout() {
         loadPositions()
+        loadTuning()
         if (width > 0 && height > 0) layoutControls(width, height)
     }
 
     fun saveLayout() {
         val edit = layoutPrefs.edit().clear()
         positions.forEach { (id, p) -> edit.putFloat("x$id", p.first).putFloat("y$id", p.second) }
+        scales.forEach { (id, s) -> edit.putFloat("s$id", s) }
         edit.apply()
     }
 
     fun resetLayout() {
         releaseAll()
         positions.clear()
+        scales.clear()
+        select(-1)
         layoutControls(width, height)
+    }
+
+    private fun stickOf(id: Int) = if (id == buttons.size + 1) leftStick else rightStick
+
+    private fun scaleOf(id: Int) = scales[id] ?: 1f
+
+    /** Cambia el tamaño sin mover el centro. */
+    private fun setSize(id: Int, w: Float, h: Float) {
+        val r = bounds(id)
+        val cx = r.centerX()
+        val cy = r.centerY()
+        when {
+            id < buttons.size -> buttons[id].rect.set(cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
+            id == buttons.size -> dpad.arm = w / 2
+            else -> stickOf(id).radius = w / 2
+        }
+    }
+
+    /** Tamaños y posiciones del usuario sobre la distribución por defecto recién calculada. */
+    private fun applyCustom(w: Int, h: Int) {
+        for (id in 0 until controlCount) bounds(id).let { baseW[id] = it.width(); baseH[id] = it.height() }
+        scales.forEach { (id, s) -> setSize(id, baseW[id] * s, baseH[id] * s) }
+        for (id in 0 until controlCount) {
+            val p = positions[id]
+            val r = bounds(id)
+            // Un control agrandado sin mover puede salirse de la pantalla: position() lo devuelve dentro.
+            if (p != null) position(id, insetLeft + p.first * (w - insetLeft - insetRight), p.second * h)
+            else if (id in scales) position(id, r.centerX(), r.centerY())
+        }
+    }
+
+    private fun remember(id: Int) {
+        val r = bounds(id)
+        positions[id] = ((r.centerX() - insetLeft) / (width - insetLeft - insetRight)) to (r.centerY() / height)
+    }
+
+    private fun select(id: Int) {
+        selected = id
+        onSelectionChanged?.invoke(if (id >= 0) scaleOf(id) else null)
+        invalidate()
+    }
+
+    fun scaleSelected(scale: Float) {
+        val id = selected
+        if (id < 0) return
+        // Pasos del 5 %: el porcentaje que se enseña queda redondo.
+        val s = ((scale * 20).roundToInt() / 20f).coerceIn(MIN_SCALE, MAX_SCALE)
+        if (s == 1f) scales.remove(id) else scales[id] = s
+        setSize(id, baseW[id] * s, baseH[id] * s)
+        val r = bounds(id)
+        position(id, r.centerX(), r.centerY())
+        remember(id)
+        onSelectionChanged?.invoke(s)
+        invalidate()
+    }
+
+    fun stepSelected(steps: Int) {
+        if (selected >= 0) scaleSelected(((scaleOf(selected) * 10).roundToInt() + steps) / 10f)
     }
 
     private fun bounds(id: Int): RectF = when {
@@ -203,7 +288,9 @@ class GamepadView(context: Context) : View(context) {
         when (e.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 dragId = e.getPointerId(0)
-                dragTarget = (0 until buttons.size + 3).firstOrNull { bounds(it).contains(e.x, e.y) } ?: -1
+                dragTarget = (0 until controlCount).firstOrNull { bounds(it).contains(e.x, e.y) } ?: -1
+                // Tocar un hueco libre quita la selección.
+                select(dragTarget)
                 if (dragTarget >= 0) {
                     val r = bounds(dragTarget)
                     dragOffsetX = e.x - r.centerX()
@@ -211,23 +298,35 @@ class GamepadView(context: Context) : View(context) {
                     onDragging?.invoke(true)
                 }
             }
+            // Con un segundo dedo, el gesto de pellizcar cambia el tamaño del control elegido.
+            MotionEvent.ACTION_POINTER_DOWN -> if (selected >= 0 && e.pointerCount == 2) {
+                if (dragTarget >= 0) onDragging?.invoke(false)
+                dragTarget = -1
+                pinchSpan = max(1f, span(e))
+                pinchScale = scaleOf(selected)
+            }
             MotionEvent.ACTION_MOVE -> {
                 val i = e.findPointerIndex(dragId)
-                if (dragTarget >= 0 && i >= 0) {
+                if (pinchSpan > 0f && e.pointerCount >= 2) {
+                    scaleSelected(pinchScale * span(e) / pinchSpan)
+                } else if (dragTarget >= 0 && i >= 0) {
                     position(dragTarget, e.getX(i) - dragOffsetX, e.getY(i) - dragOffsetY)
-                    val r = bounds(dragTarget)
-                    positions[dragTarget] = ((r.centerX() - insetLeft) / (width - insetLeft - insetRight)) to (r.centerY() / height)
+                    remember(dragTarget)
                 }
             }
+            MotionEvent.ACTION_POINTER_UP -> if (e.pointerCount <= 2) pinchSpan = 0f
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 if (dragTarget >= 0) onDragging?.invoke(false)
                 dragId = NONE
                 dragTarget = -1
+                pinchSpan = 0f
             }
         }
         invalidate()
         return true
     }
+
+    private fun span(e: MotionEvent) = hypot(e.getX(0) - e.getX(1), e.getY(0) - e.getY(1))
 
     fun releaseAll() {
         hardwareButtons.clear()
@@ -305,7 +404,7 @@ class GamepadView(context: Context) : View(context) {
 
         circle(l3, left + 49 * u, .49f * h, small)
         circle(r3, cx + 12 * u, .76f * h, small)
-        positions.forEach { (id, p) -> position(id, insetLeft + p.first * (w - insetLeft - insetRight), p.second * h) }
+        applyCustom(w, h)
         updateGestureExclusion(w, h)
         invalidate()
     }
@@ -336,8 +435,8 @@ class GamepadView(context: Context) : View(context) {
         circle(face[0],fx,fy-gap,8*u); circle(face[1],fx+gap,fy,8*u)
         circle(face[2],fx,fy+gap,8*u); circle(face[3],fx-gap,fy,8*u)
         circle(l3,x(25f),y(.66f),7*u); circle(r3,x(74f),y(.66f),7*u)
-        positions.forEach { (id,p) -> position(id, insetLeft+p.first*(w-insetLeft-insetRight), p.second*h) }
-        updateGestureExclusion(w,h)
+        applyCustom(w, h)
+        updateGestureExclusion(w, h)
         invalidate()
     }
 
@@ -402,10 +501,21 @@ class GamepadView(context: Context) : View(context) {
     // Primero lo más pequeño: los botones van por encima de las zonas de los sticks.
     private fun a11yAt(x: Float, y: Float): Int = (0 until a11yCount).firstOrNull { a11yBounds(it)?.contains(x, y) == true } ?: NO_ID
 
-    /** Doble toque de TalkBack: el botón se pulsa un momento, como un toque corto con el dedo. */
+    private fun a11yControl(id: Int): Int = when {
+        id < buttons.size -> id
+        id < buttons.size + DPAD_DIRECTIONS.size -> buttons.size
+        id == buttons.size + DPAD_DIRECTIONS.size -> buttons.size + 1
+        else -> buttons.size + 2
+    }
+
+    /** Doble toque de TalkBack: el botón se pulsa un momento, como un toque corto con el dedo. En el editor, lo elige. */
     private fun a11yPress(id: Int): Boolean {
+        if (editing) {
+            select(a11yControl(id))
+            return true
+        }
         val mask = a11yMask(id)
-        if (editing || mask == 0) return false
+        if (mask == 0) return false
         val key = A11Y_KEY_BASE - id
         setHardwareButton(key, mask, true)
         postDelayed({ setHardwareButton(key, mask, false) }, A11Y_PRESS_MS)
@@ -448,7 +558,8 @@ class GamepadView(context: Context) : View(context) {
                 if (a11yFocused == id) AccessibilityNodeInfo.AccessibilityAction.ACTION_CLEAR_ACCESSIBILITY_FOCUS
                 else AccessibilityNodeInfo.AccessibilityAction.ACTION_ACCESSIBILITY_FOCUS,
             )
-            if (!editing && a11yMask(id) != 0) {
+            if (editing) info.isSelected = a11yControl(id) == selected
+            if (editing || a11yMask(id) != 0) {
                 info.isClickable = true
                 info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)
             }
@@ -617,15 +728,24 @@ class GamepadView(context: Context) : View(context) {
             buttons = mask and 0xFFFF,
             lt = if (lt.pressed || mask and Buttons.TRIGGER_L != 0) 255 else 0,
             rt = if (rt.pressed || mask and Buttons.TRIGGER_R != 0) 255 else 0,
-            lx = axis(leftStick.valueX),
-            ly = axis(-leftStick.valueY),
-            rx = axis(rightStick.valueX),
-            ry = axis(-rightStick.valueY),
+            lx = axis(shaped(leftStick, leftStick.valueX)),
+            ly = axis(-shaped(leftStick, leftStick.valueY)),
+            rx = axis(shaped(rightStick, rightStick.valueX)),
+            ry = axis(-shaped(rightStick, rightStick.valueY)),
         )
         if (state != lastState) {
             lastState = state
             onStateChanged?.invoke(state)
         }
+    }
+
+    /** Zona muerta radial y curva opcional sobre el recorrido; la dirección del stick no cambia. */
+    private fun shaped(s: Stick, v: Float): Float {
+        val m = min(1f, hypot(s.valueX, s.valueY))
+        if (m <= deadZone || m == 0f) return 0f
+        var out = (m - deadZone) / (1f - deadZone)
+        if (fineCenter) out *= out
+        return v * out / m
     }
 
     private fun axis(v: Float): Int = (v * 32767).roundToInt().coerceIn(-32768, 32767)
@@ -639,6 +759,22 @@ class GamepadView(context: Context) : View(context) {
         drawStick(canvas, rightStick)
         drawDpad(canvas)
         for (b in buttons) drawButton(canvas, b)
+        if (editing && selected >= 0) drawSelection(canvas)
+    }
+
+    private fun drawSelection(canvas: Canvas) {
+        val r = bounds(selected)
+        val gap = 1.5f * unit
+        stroke.color = CARAMEL
+        stroke.strokeWidth = max(3f, 0.8f * unit)
+        val round = selected > buttons.size || selected < buttons.size && buttons[selected].round
+        if (round) {
+            canvas.drawCircle(r.centerX(), r.centerY(), r.width() / 2 + gap, stroke)
+        } else {
+            r.inset(-gap, -gap)
+            canvas.drawRoundRect(r, 4 * unit, 4 * unit, stroke)
+        }
+        stroke.strokeWidth = max(2f, 0.5f * unit)
     }
 
     private fun drawStatus(canvas: Canvas) {
@@ -672,22 +808,24 @@ class GamepadView(context: Context) : View(context) {
 
         text.color = if (on) BACKGROUND else b.color
         val subLabel = b.sub
+        // Las etiquetas crecen y encogen con el botón.
+        val k = unit * scaleOf(buttons.indexOf(b))
         if (b.face) {
             text.textSize = b.rect.height() * 0.5f
         } else if (b.round) {
-            text.textSize = 3.6f * unit
+            text.textSize = 3.6f * k
         } else {
-            text.textSize = 5f * unit
+            text.textSize = 5f * k
         }
         val baseline = if (subLabel.isEmpty()) {
             b.rect.centerY() - (text.descent() + text.ascent()) / 2
         } else {
-            b.rect.centerY() - 0.5f * unit
+            b.rect.centerY() - 0.5f * k
         }
         canvas.drawText(b.label, b.rect.centerX(), baseline, text)
         if (subLabel.isNotEmpty()) {
-            text.textSize = 3.4f * unit
-            canvas.drawText(subLabel, b.rect.centerX(), baseline + 4.5f * unit, text)
+            text.textSize = 3.4f * k
+            canvas.drawText(subLabel, b.rect.centerX(), baseline + 4.5f * k, text)
         }
     }
 
@@ -753,6 +891,10 @@ class GamepadView(context: Context) : View(context) {
         private val DPAD_DIRECTIONS = intArrayOf(Buttons.DPAD_UP, Buttons.DPAD_DOWN, Buttons.DPAD_LEFT, Buttons.DPAD_RIGHT)
         private val DPAD_LABELS = intArrayOf(R.string.map_up, R.string.map_down, R.string.map_left, R.string.map_right)
         private const val NONE = -1
+        // 13 botones, la cruceta y los dos sticks.
+        private const val CONTROLS = 16
+        private const val MIN_SCALE = 0.6f
+        private const val MAX_SCALE = 1.6f
         private const val DOUBLE_TAP_MS = 300L
         private const val TAP_MS = 220L
 
