@@ -34,7 +34,7 @@ DuckPad se presenta con su propia identidad y Windows lo monta como **mando HID 
 Windows reconoce el mando por el PnP ID del servicio Device Information: VID, PID y versión.
 
 - Por defecto, `1209:0001:0100`. Es un PID de pruebas de [pid.codes](https://pid.codes/1209/0001/), compartido y no apto para versiones distribuidas.
-- Se ha pedido a pid.codes un PID propio, `1209:D0CC`. Cuando lo aprueben pasará a ser la identidad por defecto.
+- Se ha pedido a pid.codes un PID propio, `1209:D0CC` ([solicitud](https://github.com/pidcodes/pidcodes.github.com/pull/1307)). Cuando lo aprueben pasará a ser la identidad por defecto.
 - En **Opciones avanzadas**, al pie de la pantalla principal, se pueden guardar dos identidades (A y B) y elegir cuál se usa. Windows guarda la identidad del primer emparejamiento: después de cambiarla hay que quitar DuckPad en Windows y emparejarlo de nuevo.
 
 ## Correspondencia para SDL
@@ -45,7 +45,7 @@ Mientras DuckPad no esté en SDL_GameControllerDB, un programa con SDL2 o SDL3 l
 03000000091200000100000000000000,DuckPad,a:b0,b:b1,x:b3,y:b4,back:b10,guide:b12,start:b11,leftstick:b13,rightstick:b14,leftshoulder:b6,rightshoulder:b7,dpup:h0.1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,leftx:a0,lefty:a1,rightx:a3,righty:a6,lefttrigger:a4,righttrigger:a5,platform:Windows,
 ```
 
-Es para la identidad `1209:0001`. Con otra, cambian los bytes del VID y el PID en el GUID (posiciones 9 a 12 y 17 a 20, en little-endian). Detalles y pruebas en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Es para la identidad `1209:0001`. Con otra, cambian los bytes del VID y el PID en el GUID (posiciones 9 a 12 y 17 a 20, en little-endian). Detalles y pruebas en [docs/PRUEBAS.md](docs/PRUEBAS.md). La entrada preparada para SDL_GameControllerDB con el PID propio está en [docs/SDL_GameControllerDB.md](docs/SDL_GameControllerDB.md).
 
 ## Compilar
 

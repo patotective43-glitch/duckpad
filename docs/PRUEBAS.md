@@ -43,7 +43,16 @@ El mando dibujado expone cada control a TalkBack como un elemento con nombre y p
 - R8 y reducción de recursos activados. La variante `staging` (mismo código reducido, clave de depuración) se instaló y se recorrió la pantalla principal, las dos identidades y el editor de controles sin errores. No se abrió una sesión con ella.
 - Lint: 0 avisos.
 
+## PID propio (`1209:D0CC`, pedido a pid.codes)
+
+Probado con la identidad B en `1209:D0CC:0100`:
+
+- Windows crea `HID\{00001812-…}_DEV_VID&021209_PID&D0CC_REV&0100_…` como mando HID genérico.
+- SDL3 le da el GUID `0300e53909120000ccd0000000000000`. Con la línea para SDL_GameControllerDB de [SDL_GameControllerDB.md](SDL_GameControllerDB.md), que lleva el GUID sin CRC (`0300000009120000ccd0000000000000`), los 21 controles llegan a su sitio por la API de mandos.
+- **Ryujinx** (canary 1.3.272), abierto con esa línea en `SDL_GAMECONTROLLERCONFIG`: lista DuckPad como dispositivo de entrada y responde a sticks y gatillos.
+- **Steam**, con «Activar Steam Input para mandos genéricos»: detecta DuckPad (`type: 1209 d0cc` en su registro de mandos), se configura con «Definir disposición» y la prueba de entradas responde.
+
 ## Sin probar
 
-- Ryujinx con su interfaz: solo se ha usado su `SDL3.dll` desde las herramientas de `tools`.
+- Un juego que solo acepta mandos Xbox, abierto desde Steam con Steam Input.
 - Reconexión tras días o con el PC suspendido, otros móviles y otros PCs.
