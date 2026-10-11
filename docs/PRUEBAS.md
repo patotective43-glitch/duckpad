@@ -39,7 +39,9 @@ El mando dibujado expone cada control a TalkBack como un elemento con nombre y p
 
 ## Versión de publicación
 
-- API objetivo 36. Desde Android 13 el botón atrás llega por `OnBackInvokedCallback`, porque con API 36 Android ya no llama a `onBackPressed`. Sin probar en Android 13 o posterior: el móvil de pruebas tiene Android 12.
+- API objetivo 36 con `enableOnBackInvokedCallback`: desde Android 13 el botón atrás llega por `OnBackInvokedCallback`. Probado en una Redmi Pad SE con Android 15: un atrás en el mando avisa, dos lo cierran y terminan la sesión en orden; en el editor, atrás abre el diálogo de descartar.
+- Sin copia de seguridad de los ajustes (`allowBackup="false"` y reglas de extracción que excluyen las preferencias).
+- Permiso de notificaciones pedido junto al de Bluetooth en Android 13 o posterior.
 - R8 y reducción de recursos activados. La variante `staging` (mismo código reducido, clave de depuración) se instaló y se recorrió la pantalla principal, las dos identidades y el editor de controles sin errores. No se abrió una sesión con ella.
 - Lint: 0 avisos.
 
@@ -51,6 +53,14 @@ Probado con la identidad B en `1209:D0CC:0100`:
 - SDL3 le da el GUID `0300e53909120000ccd0000000000000`. Con la línea para SDL_GameControllerDB de [SDL_GameControllerDB.md](SDL_GameControllerDB.md), que lleva el GUID sin CRC (`0300000009120000ccd0000000000000`), los 21 controles llegan a su sitio por la API de mandos.
 - **Ryujinx** (canary 1.3.272), abierto con esa línea en `SDL_GAMECONTROLLERCONFIG`: lista DuckPad como dispositivo de entrada y responde a sticks y gatillos.
 - **Steam**, con «Activar Steam Input para mandos genéricos»: detecta DuckPad (`type: 1209 d0cc` en su registro de mandos), se configura con «Definir disposición» y la prueba de entradas responde.
+
+## Dos aparatos con DuckPad en el mismo PC
+
+Un móvil y una tablet, los dos con `1209:D0CC`, emparejados a la vez: Windows crea dos mandos HID y SDL los ve como dos mandos (`mando0` y `mando1`). Cada pulsación llega solo al suyo, también pulsando en los dos a la vez. En Configuración de Windows aparecen cuatro entradas «DuckPad», dos por aparato, y no se distingue cuál es cuál.
+
+## Tablets
+
+En la Redmi Pad SE (16:10) la distribución horizontal pisaba controles: estaba calculada solo con el alto. Ahora el tamaño se limita también por el ancho y las alturas van en proporción a la pantalla; en móviles alargados no cambia nada. Si el PC no tiene nombre conocido, el estado dice «Conectado a PC» en vez de su dirección Bluetooth.
 
 ## Sin probar
 

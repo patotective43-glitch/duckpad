@@ -260,11 +260,14 @@ class GamepadView(context: Context) : View(context) {
         layoutControls(w, h)
     }
 
-    /** Medidas en «u» = 1 % del alto, para que la distribución sea la misma en cualquier pantalla apaisada. */
+    /**
+     * Medidas en «u» = 1 % del alto, salvo en pantallas poco alargadas (tablets), donde manda el ancho para que los
+     * controles no se pisen. Las alturas van en proporción a la pantalla.
+     */
     private fun layoutControls(w: Int, h: Int) {
         releaseAll()
         if (h > w) { layoutPortrait(w, h); return }
-        val u = h / 100f
+        val u = min(h / 100f, (w - insetLeft - insetRight) / LANDSCAPE_WIDTH_U)
         unit = u
         slop = 3 * u
         val left = insetLeft + 4 * u
@@ -281,18 +284,18 @@ class GamepadView(context: Context) : View(context) {
         rb.rect.set(rt.rect.left - 2 * u - bumpW, top, rt.rect.left - 2 * u, top + barH)
 
         val small = 6.5f * u
-        val centerY = 34 * u
+        val centerY = .34f * h
         circle(view, cx - 17 * u, centerY, small)
         circle(guide, cx, centerY, small)
         circle(menu, cx + 17 * u, centerY, small)
 
         val stickR = 17 * u
-        leftStick.apply { homeX = left + 24 * u; homeY = 55 * u; radius = stickR }
-        rightStick.apply { homeX = cx + 36 * u; homeY = 76 * u; radius = stickR }
-        dpad.apply { this.cx = cx - 36 * u; cy = 76 * u; arm = 15 * u }
+        leftStick.apply { homeX = left + 24 * u; homeY = .55f * h; radius = stickR }
+        rightStick.apply { homeX = cx + 36 * u; homeY = .76f * h; radius = stickR }
+        dpad.apply { this.cx = cx - 36 * u; cy = .76f * h; arm = 15 * u }
 
         val faceX = right - 24 * u
-        val faceY = 55 * u
+        val faceY = .55f * h
         val gap = 13 * u
         val faceR = 8 * u
         circle(face[0], faceX, faceY - gap, faceR)
@@ -300,20 +303,22 @@ class GamepadView(context: Context) : View(context) {
         circle(face[2], faceX, faceY + gap, faceR)
         circle(face[3], faceX - gap, faceY, faceR)
 
-        circle(l3, left + 49 * u, 49 * u, small)
-        circle(r3, cx + 12 * u, 76 * u, small)
+        circle(l3, left + 49 * u, .49f * h, small)
+        circle(r3, cx + 12 * u, .76f * h, small)
         positions.forEach { (id, p) -> position(id, insetLeft + p.first * (w - insetLeft - insetRight), p.second * h) }
         updateGestureExclusion(w, h)
         invalidate()
     }
 
     private fun layoutPortrait(w: Int, h: Int) {
-        val u = (w - insetLeft - insetRight) / 100f
+        val usableWidth = w - insetLeft - insetRight
+        val usableHeight = h - insetTop - insetBottom
+        // En tablets el alto no da para el ancho completo: se encoge y se centra.
+        val u = min(usableWidth / 100f, usableHeight / PORTRAIT_HEIGHT_U)
         unit = u
         slop = 2 * u
-        val left = insetLeft.toFloat()
+        val left = insetLeft + (usableWidth - 100 * u) / 2
         val usableTop = insetTop.toFloat()
-        val usableHeight = h - insetTop - insetBottom
         fun x(v: Float) = left + v * u
         fun y(v: Float) = usableTop + usableHeight * v
         fun bar(b: Button, from: Float, to: Float, row: Float) {
@@ -740,6 +745,9 @@ class GamepadView(context: Context) : View(context) {
 
     companion object {
         private const val NO_ID = Int.MIN_VALUE
+        // Ancho mínimo (en «u») de la distribución horizontal y alto mínimo de la vertical para que nada se pise.
+        private const val LANDSCAPE_WIDTH_U = 205f
+        private const val PORTRAIT_HEIGHT_U = 200f
         private const val A11Y_KEY_BASE = -1000
         private const val A11Y_PRESS_MS = 150L
         private val DPAD_DIRECTIONS = intArrayOf(Buttons.DPAD_UP, Buttons.DPAD_DOWN, Buttons.DPAD_LEFT, Buttons.DPAD_RIGHT)

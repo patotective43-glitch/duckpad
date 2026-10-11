@@ -259,7 +259,8 @@ object BlePad {
         wrongEntry = false
         staleBond = false
         Prefs(app).let { if (device.address !in it.peers) it.peers = it.peers + device.address }
-        connectedName = device.name ?: device.address
+        // Sin nombre conocido se muestra «PC»: la dirección Bluetooth no dice nada a nadie y saldría en las capturas.
+        connectedName = device.name
         Prefs(app).linkActive = true
         log("${device.address} es el PC del mando")
         setState(State.CONNECTED)

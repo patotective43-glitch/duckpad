@@ -57,5 +57,4 @@ Requires Bluetooth LE on the phone and the PC. Open source (GPL-3.0). No ads, no
 ## Pendiente antes de enviar
 
 - PID propio aprobado en pid.codes y puesto como identidad por defecto (hoy es el de pruebas `1209:0001`, que no se puede distribuir).
-- Capturas: pantalla principal, mando en horizontal y en vertical, editor. Icono de 512 px y gráfico de cabecera de 1024 × 500.
-- Probar la versión firmada en un móvil con Android 13 o posterior (botón atrás con API 36).
+- Capturas, icono y cabeceras: hechos, en [../playstore](../playstore/LEEME.md).

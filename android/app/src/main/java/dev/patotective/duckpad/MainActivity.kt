@@ -191,7 +191,9 @@ class MainActivity : Activity() {
         if (action.text != actionLabel) action.text = actionLabel
         action.setOnClickListener {
             if (!hasPermission() && Build.VERSION.SDK_INT >= 31) {
-                requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_ADVERTISE), 1)
+                val wanted = listOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_ADVERTISE) +
+                    if (Build.VERSION.SDK_INT >= 33) listOf(Manifest.permission.POST_NOTIFICATIONS) else emptyList()
+                requestPermissions(wanted.toTypedArray(), 1)
             } else {
                 try { startActivity(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)) }
                 catch (_: SecurityException) { lastStatus = "" }
