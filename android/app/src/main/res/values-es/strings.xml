@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="credit">Desarrollado por patotective</string>
+    <string name="home_subtitle">Mando Bluetooth para Windows, con controles táctiles. Los botones de volumen pueden hacer de gatillos.</string>
+
+    <string name="bt_state_off">El Bluetooth está apagado.</string>
+    <string name="bt_turn_on">Encender Bluetooth</string>
+    <string name="bt_state_no_permission">DuckPad necesita permiso de Bluetooth para aparecer en el PC como mando.</string>
+    <string name="bt_grant">Dar permiso</string>
+
+    <string name="session_title">Jugar</string>
+    <string name="session_ready">Listo. Inicia una sesión para jugar.</string>
+    <string name="session_waiting">Sesión abierta, esperando al PC.</string>
+    <string name="session_connected">Sesión abierta, conectado a %1$s.</string>
+    <string name="session_closing">Cerrando la conexión…</string>
+    <string name="session_lost">La última sesión se cortó con el PC conectado. Si al iniciar no conecta, quita DuckPad en Windows y vuelve a agregarlo.</string>
+    <string name="session_interrupted">La última sesión se cerró de golpe. Prueba a iniciar; si el PC no recupera el mando, quita DuckPad en Windows y vuelve a emparejar.</string>
+    <string name="session_channel">Sesión del mando</string>
+    <string name="session_notification">Sesión abierta. Sal del mando con atrás para cerrarla.</string>
+    <string name="session_start">Iniciar sesión</string>
+    <string name="session_back">Volver al mando</string>
+    <string name="session_end">Terminar sesión</string>
+
+    <string name="steps_show">Ver los pasos</string>
+    <string name="steps_hide">Ocultar los pasos</string>
+    <string name="setup_1">1. Toca Iniciar sesión en este móvil.</string>
+    <string name="setup_2">2. En el PC, pulsa Conectar en el aviso de DuckPad. Si no sale, abre Configuración &gt; Bluetooth y dispositivos &gt; Agregar dispositivo &gt; Bluetooth.</string>
+    <string name="setup_3">3. Salen dos DuckPad. Elige el del icono de dos dispositivos, no el del teléfono. El orden de la lista puede cambiar.</string>
+    <string name="choose_device">Este</string>
+    <string name="avoid_phone">Este no</string>
+    <string name="guide_accessibility">En la lista de Windows, elige DuckPad con el icono de dos dispositivos, no el que tiene icono de teléfono.</string>
+    <string name="setup_4">4. Cuando el mando diga Conectado, a jugar. Las siguientes veces basta con tocar Iniciar sesión: Windows se conecta solo. Para terminar, pulsa atrás dos veces o Terminar sesión.</string>
+
+    <string name="settings_title">Ajustes</string>
+    <string name="orientation_label">Cómo sujetas el móvil</string>
+    <string name="landscape">Horizontal</string>
+    <string name="portrait">Vertical</string>
+    <string name="orientation_help">Cada orientación guarda sus propias posiciones. Termina la sesión para cambiarla.</string>
+    <string name="edit_layout">Colocar controles</string>
+    <string name="volume_enable">Usar los botones de volumen en el mando</string>
+    <string name="volume_help">Por defecto, Volumen − es LT y Volumen + es RT. Puedes cambiarlo abajo. Fuera del mando, el volumen funciona como siempre.</string>
+    <string name="volume_normal">Volumen normal</string>
+    <string name="volume_up_label">Volumen +</string>
+    <string name="volume_down_label">Volumen −</string>
+    <string name="map_up">Cruceta ↑</string>
+    <string name="map_down">Cruceta ↓</string>
+    <string name="map_left">Cruceta ←</string>
+    <string name="map_right">Cruceta →</string>
+    <string name="haptics">Vibrar al pulsar un botón</string>
+
+    <string name="advanced_show">Opciones avanzadas</string>
+    <string name="advanced_hide">Ocultar opciones avanzadas</string>
+    <string name="identity_title">Identidad del mando</string>
+    <string name="identity_help">Son los tres números con los que Windows reconoce el mando, en hexadecimal. Windows los guarda al emparejar: si los cambias, termina la sesión, quita DuckPad en Configuración &gt; Bluetooth y dispositivos y vuelve a emparejarlo. Sin ese paso, Windows ignora el cambio o deja el mando a medias.</string>
+    <string name="identity_default_note">La identidad de DuckPad, 1209:0001, es un número de pruebas compartido de pid.codes: otros aparatos en pruebas pueden usar el mismo.</string>
+    <string name="identity_responsibility">Usar los números de otro fabricante es responsabilidad tuya.</string>
+    <string name="identity_vid">VID</string>
+    <string name="identity_pid">PID</string>
+    <string name="identity_version">Versión</string>
+    <string name="identity_save">Guardar identidad</string>
+    <string name="identity_reset">Restablecer la de DuckPad</string>
+    <string name="identity_saved">Identidad %1$s guardada: %2$s. Se usará en la próxima sesión, después de volver a emparejar.</string>
+    <string name="identity_reset_done">Identidad %1$s restablecida: %2$s. Se usará en la próxima sesión, después de volver a emparejar.</string>
+    <string name="identity_invalid">Escribe de 1 a 4 cifras hexadecimales (0–9, A–F).</string>
+    <string name="identity_slot_label">Identidad en uso</string>
+    <string name="identity_slot_entry">Identidad %1$s: %2$s</string>
+    <string name="identity_slot_help">Los campos de abajo cambian la identidad elegida. Pasar de una a otra también exige quitar DuckPad en Windows y emparejarlo de nuevo.</string>
+    <string name="identity_switched">Ahora se usa la identidad %1$s (%2$s). Se aplicará en la próxima sesión, después de quitar DuckPad en Windows y emparejarlo de nuevo.</string>
+    <string name="identity_locked">Termina la sesión para cambiar la identidad.</string>
+
+    <string name="status_bt_connected">Conectado a %1$s</string>
+    <string name="status_ble_starting">Preparando el mando…</string>
+    <string name="status_ble_waiting">Esperando al PC. La primera vez, agrega «DuckPad» desde su Bluetooth</string>
+    <string name="status_ble_wrong">Entrada equivocada: quítala en Windows y elige el DuckPad sin icono de teléfono</string>
+    <string name="status_ble_stale">Windows guarda un emparejamiento antiguo: quita DuckPad en Windows y agrégalo de nuevo</string>
+    <string name="status_ble_silent">Seguimos esperando al PC. Comprueba su Bluetooth. Si no conecta, apágalo 10 segundos y vuelve a encenderlo antes de intentar emparejar de nuevo.</string>
+    <string name="status_ble_checking">Comprobando la conexión del mando…</string>
+    <string name="status_ble_generic">Windows todavía no ha confirmado el mando. Seguimos intentando conectar. Si no responde, apaga el Bluetooth del PC 10 segundos y vuelve a encenderlo.</string>
+    <string name="status_ble_lost">La app se cerró de golpe con el PC conectado y Windows ha olvidado el mando. Quita DuckPad en Windows y vuelve a agregarlo.</string>
+    <string name="status_ble_failed">El mando no está disponible: %1$s</string>
+    <string name="ble_fail_off">el Bluetooth está apagado</string>
+    <string name="ble_fail_no_advertising">este móvil no puede anunciarse por Bluetooth LE</string>
+    <string name="ble_fail_gatt">no se pudo abrir el servidor Bluetooth</string>
+    <string name="ble_fail_service">Android rechazó el servicio %1$s</string>
+    <string name="ble_fail_advertise">el anuncio falló (código %1$d)</string>
+    <string name="exit_hint">Pulsa atrás otra vez para salir del mando</string>
+
+    <string name="a11y_left_stick">Stick izquierdo. Para moverlo, apoya el dedo en la mitad izquierda de la pantalla y arrástralo.</string>
+    <string name="a11y_right_stick">Stick derecho. Para moverlo, apoya el dedo en la mitad derecha de la pantalla y arrástralo.</string>
+    <string name="label_view">Vista</string>
+    <string name="label_guide">Guía</string>
+    <string name="label_menu">Menú</string>
+    <string name="layout_save">Guardar</string>
+    <string name="layout_reset">Restablecer</string>
+    <string name="layout_cancel">Cancelar</string>
+    <string name="layout_move_bar">Mover</string>
+    <string name="layout_hint">Arrastra los controles donde quieras</string>
+    <string name="layout_discard">¿Descartar los cambios de posición?</string>
+    <string name="layout_discard_ok">Descartar</string>
+    <string name="layout_reset_confirm">¿Volver a la distribución inicial?</string>
+    <string name="move_toolbar">Mover la barra al otro borde</string>
+</resources>

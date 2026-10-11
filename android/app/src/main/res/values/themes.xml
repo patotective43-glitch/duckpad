@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#8F4C14</color>
+    <color name="error">#B3261E</color>
+
+    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:colorPrimary">@color/accent</item>
+        <item name="android:colorPrimaryDark">@color/accent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <!-- Iconos oscuros del sistema sobre el fondo claro: sobre el caramelo apenas se leían. -->
+        <item name="android:statusBarColor">@android:color/background_light</item>
+    </style>
+
+    <!-- El mando es oscuro siempre: se usa con el PC delante y una pantalla clara deslumbra y gasta batería. -->
+    <style name="ControllerTheme" parent="android:Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+</resources>

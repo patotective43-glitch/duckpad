@@ -1,0 +1,17 @@
+# Compilación
+android/.gradle/
+android/.kotlin/
+android/build/
+android/app/build/
+android/local.properties
+*.apk
+*.aab
+
+# Firma: nunca en el repositorio
+*.jks
+*.keystore
+keystore.properties
+
+# Notas y resultados solo para este PC
+local/
+NOTAS-LOCALES.md

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Caramelo oscuro de la app: el mando crema destaca 6:1 sobre él. -->
+    <color name="ic_launcher_background">#8F4C14</color>
+</resources>

@@ -1,0 +1,32 @@
+[
+  {
+    "ciclo": 1,
+    "cierre_ordenado": true,
+    "nodo_hid_desaparece_al_cerrar": true,
+    "anuncio": true,
+    "pc_reconecta": true,
+    "segundos_desde_anuncio_hasta_pc": 1.18,
+    "nodo_hid_vuelve": true,
+    "segundos_desde_toque_hasta_nodo_hid": 7.73
+  },
+  {
+    "ciclo": 2,
+    "cierre_ordenado": true,
+    "nodo_hid_desaparece_al_cerrar": true,
+    "anuncio": true,
+    "pc_reconecta": true,
+    "segundos_desde_anuncio_hasta_pc": 2.17,
+    "nodo_hid_vuelve": true,
+    "segundos_desde_toque_hasta_nodo_hid": 8.61
+  },
+  {
+    "ciclo": 3,
+    "cierre_ordenado": true,
+    "nodo_hid_desaparece_al_cerrar": true,
+    "anuncio": true,
+    "pc_reconecta": true,
+    "segundos_desde_anuncio_hasta_pc": 0.87,
+    "nodo_hid_vuelve": true,
+    "segundos_desde_toque_hasta_nodo_hid": 7.62
+  }
+]

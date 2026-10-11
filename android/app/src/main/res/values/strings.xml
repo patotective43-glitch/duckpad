@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name" translatable="false">DuckPad</string>
+    <string name="credit">Made by patotective</string>
+    <string name="home_subtitle">Bluetooth controller for Windows with touch controls. The volume buttons can work as triggers.</string>
+
+    <string name="bt_state_off">Bluetooth is off.</string>
+    <string name="bt_turn_on">Turn on Bluetooth</string>
+    <string name="bt_state_no_permission">DuckPad needs Bluetooth permission to show up on your PC as a controller.</string>
+    <string name="bt_grant">Allow Bluetooth</string>
+
+    <string name="session_title">Play</string>
+    <string name="session_ready">Ready. Start a session to play.</string>
+    <string name="session_waiting">Session open, waiting for the PC.</string>
+    <string name="session_connected">Session open, connected to %1$s.</string>
+    <string name="session_closing">Closing the connection…</string>
+    <string name="session_lost">The last session was cut off while the PC was connected. If it does not connect when you start, remove DuckPad in Windows and add it again.</string>
+    <string name="session_interrupted">The last session ended unexpectedly. Try starting; if the PC cannot restore the controller, remove DuckPad in Windows and pair again.</string>
+    <string name="session_channel">Controller session</string>
+    <string name="session_notification">Session open. Leave the controller with back to end it.</string>
+    <string name="session_start">Start session</string>
+    <string name="session_back">Back to the controller</string>
+    <string name="session_end">End session</string>
+
+    <string name="steps_show">Show the steps</string>
+    <string name="steps_hide">Hide the steps</string>
+    <string name="setup_1">1. Tap Start session on this phone.</string>
+    <string name="setup_2">2. On the PC, click Connect in the DuckPad notification. If it doesn\'t show up, open Settings &gt; Bluetooth &amp; devices &gt; Add device &gt; Bluetooth.</string>
+    <string name="setup_3">3. Two DuckPad entries show up. Choose the one with the two-device icon, not the phone. The order in the list may change.</string>
+    <string name="choose_device">This one</string>
+    <string name="avoid_phone">Not this one</string>
+    <string name="guide_accessibility">In the Windows list, choose DuckPad with the two-device icon, not the one with the phone icon.</string>
+    <string name="setup_4">4. When the controller says Connected, play. Next time, just tap Start session: Windows connects by itself. To finish, press back twice or tap End session.</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="orientation_label">How you hold your phone</string>
+    <string name="landscape">Landscape</string>
+    <string name="portrait">Portrait</string>
+    <string name="orientation_help">Each orientation saves its own layout. End the session to switch.</string>
+    <string name="edit_layout">Arrange controls</string>
+    <string name="volume_enable">Use the volume buttons on the controller</string>
+    <string name="volume_help">By default, Volume − is LT and Volume + is RT. You can change it below. Outside the controller, volume works as usual.</string>
+    <string name="volume_normal">Normal volume</string>
+    <string name="volume_up_label">Volume +</string>
+    <string name="volume_down_label">Volume −</string>
+    <string name="map_up">D-pad ↑</string>
+    <string name="map_down">D-pad ↓</string>
+    <string name="map_left">D-pad ←</string>
+    <string name="map_right">D-pad →</string>
+    <string name="haptics">Vibrate on button press</string>
+
+    <string name="advanced_show">Advanced options</string>
+    <string name="advanced_hide">Hide advanced options</string>
+    <string name="identity_title">Controller identity</string>
+    <string name="identity_help">These are the three numbers Windows uses to recognize the controller, in hexadecimal. Windows stores them when pairing: if you change them, end the session, remove DuckPad in Settings &gt; Bluetooth &amp; devices and pair it again. Without that step, Windows ignores the change or leaves the controller half set up.</string>
+    <string name="identity_default_note">The DuckPad identity, 1209:0001, is a shared pid.codes test number: other devices under test may use it too.</string>
+    <string name="identity_responsibility">Using another manufacturer\'s numbers is your responsibility.</string>
+    <string name="hex4" translatable="false">%1$04X</string>
+    <string name="identity_vid">VID</string>
+    <string name="identity_pid">PID</string>
+    <string name="identity_version">Version</string>
+    <string name="identity_save">Save identity</string>
+    <string name="identity_reset">Restore DuckPad\'s</string>
+    <string name="identity_saved">Identity %1$s saved: %2$s. It applies to the next session, after pairing again.</string>
+    <string name="identity_reset_done">Identity %1$s restored: %2$s. It applies to the next session, after pairing again.</string>
+    <string name="identity_invalid">Enter 1 to 4 hexadecimal digits (0–9, A–F).</string>
+    <string name="identity_slot_label">Identity in use</string>
+    <string name="identity_slot_a" translatable="false">A</string>
+    <string name="identity_slot_b" translatable="false">B</string>
+    <string name="identity_slot_entry">Identity %1$s: %2$s</string>
+    <string name="identity_slot_help">The fields below change the chosen identity. Switching between them also means removing DuckPad in Windows and pairing it again.</string>
+    <string name="identity_switched">Now using identity %1$s (%2$s). It applies to the next session, after removing DuckPad in Windows and pairing it again.</string>
+    <string name="identity_locked">End the session to change the identity.</string>
+
+    <string name="status_bt_connected">Connected to %1$s</string>
+    <string name="status_ble_starting">Getting the controller ready…</string>
+    <string name="status_ble_waiting">Waiting for the PC. First time? Add “DuckPad” in its Bluetooth settings</string>
+    <string name="status_ble_wrong">Wrong entry: remove it in Windows and pick the DuckPad without a phone icon</string>
+    <string name="status_ble_stale">Windows kept an old pairing: remove DuckPad in Windows and add it again</string>
+    <string name="status_ble_silent">Still waiting for the PC. Check its Bluetooth. If it will not connect, turn Bluetooth off for 10 seconds and back on before trying to pair again.</string>
+    <string name="status_ble_checking">Checking the controller connection…</string>
+    <string name="status_ble_generic">Windows has not confirmed the controller yet. Still trying to connect. If it will not respond, turn the PC Bluetooth off for 10 seconds and back on.</string>
+    <string name="status_ble_lost">The app closed abruptly while the PC was connected, and Windows has dropped the controller. Remove DuckPad in Windows and add it again.</string>
+    <string name="status_ble_failed">The controller isn\'t available: %1$s</string>
+    <string name="ble_fail_off">Bluetooth is off</string>
+    <string name="ble_fail_no_advertising">this phone can\'t advertise over Bluetooth LE</string>
+    <string name="ble_fail_gatt">the Bluetooth server didn\'t open</string>
+    <string name="ble_fail_service">Android rejected the %1$s service</string>
+    <string name="ble_fail_advertise">advertising failed (code %1$d)</string>
+    <string name="exit_hint">Press back again to leave the controller</string>
+
+    <string name="a11y_left_stick">Left stick. To move it, rest a finger on the left half of the screen and drag.</string>
+    <string name="a11y_right_stick">Right stick. To move it, rest a finger on the right half of the screen and drag.</string>
+    <string name="label_view">View</string>
+    <string name="label_guide">Guide</string>
+    <string name="label_menu">Menu</string>
+    <string name="layout_save">Save</string>
+    <string name="layout_reset">Reset</string>
+    <string name="layout_cancel">Cancel</string>
+    <string name="layout_move_bar">Move</string>
+    <string name="layout_hint">Drag the controls where you want them</string>
+    <string name="layout_discard">Discard layout changes?</string>
+    <string name="layout_discard_ok">Discard</string>
+    <string name="layout_reset_confirm">Restore the default layout?</string>
+    <string name="move_toolbar">Move toolbar to the other edge</string>
+</resources>
