@@ -52,18 +52,26 @@ def tap_node(n):
 
 def scroll_to(rid, top_third=False):
     """Scrolls the main screen until the view is on screen (or in its upper third)."""
-    for _ in range(12):
+    for i in range(24):
         root = dump()
-        h = bounds(root.find("node"))[3]
+        w, h = bounds(root.find("node"))[2:]
         n = find(root, rid)
         if n is not None:
             t = bounds(n)[1]
             if 0 < t < (h // 3 if top_third else h - 150):
                 return n
-        w = bounds(root.find("node"))[2]
-        adb("shell", "input", "swipe", w // 2, h * 3 // 4, w // 2, h // 4, 400)
+        # Down first; after 12 tries, back up.
+        y1, y2 = (h * 3 // 4, h // 4) if i < 12 else (h // 4, h * 3 // 4)
+        adb("shell", "input", "swipe", w // 2, y1, w // 2, y2, 400)
         time.sleep(0.6)
     sys.exit(f"{rid} not found")
+
+
+def scroll_top():
+    w, h = bounds(dump().find("node"))[2:]
+    for _ in range(4):
+        adb("shell", "input", "swipe", w // 2, h // 4, w // 2, h * 3 // 4, 200)
+    time.sleep(1)
 
 
 def tap(rid):
@@ -81,14 +89,15 @@ def wait_log(texts, seconds):
 
 
 def main_screen(*extra):
-    adb("shell", "am", "start", "-n", f"{PKG}/.MainActivity", *extra)
+    # Single top: if the main screen is already open, the extras still reach it through onNewIntent.
+    adb("shell", "am", "start", "--activity-single-top", "-n", f"{PKG}/.MainActivity", *extra)
     time.sleep(2.5)
 
 
 def session(label):
     adb("logcat", "-c")
     tap("session_start")
-    if not wait_log(("notificaciones enviadas", "envío en marcha"), 120):
+    if not wait_log(("notificaciones enviadas", "envÃ­o en marcha"), 120):
         print("the PC did not connect: no shot", label)
     else:
         time.sleep(4)
@@ -104,19 +113,14 @@ def session(label):
 prefs = adb("shell", "run-as", PKG, "cat", "shared_prefs/settings.xml")
 was_portrait = 'name="portrait" value="true"' in prefs
 theme = re.search(r'name="theme" value="(\d)"', prefs)
-old_theme = ["theme_system", "theme_light", "theme_dark"][int(theme.group(1)) if theme else 0]
+old_theme = theme.group(1) if theme else "0"
 
-main_screen("--ez", "demo", "true")
-tap("theme_dark")
-time.sleep(1.5)
-main_screen()
+main_screen("--ez", "demo", "true", "--ei", "theme", "2")
 tap("landscape")
 
 main_screen()
+scroll_top()
 shot("home")
-scroll_to("dead_zone_label", top_third=True)
-time.sleep(1)
-shot("settings")
 
 session("controller")
 
@@ -127,6 +131,9 @@ time.sleep(2)
 y = find(dump(), desc="Y")
 if y is not None:
     tap_node(y)
+    bigger = find(dump(), desc="Make bigger")
+    for _ in range(2):
+        tap_node(bigger)
 shot("editor")
 adb("shell", "input", "keyevent", "BACK")
 time.sleep(1)
@@ -145,7 +152,5 @@ if kind == "phone":
 main_screen()
 if was_portrait:
     tap("portrait")
-tap(old_theme)
-time.sleep(1.5)
-main_screen("--ez", "demo", "false")
+main_screen("--ez", "demo", "false", "--ei", "theme", old_theme)
 print("theme back to", old_theme, "| orientation", "portrait" if was_portrait else "landscape")

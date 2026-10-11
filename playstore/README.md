@@ -7,10 +7,10 @@ Upload in Play Console > Grow users > Store presence > Main store listing. The l
 | `icon-512.png` | App icon | 512 × 512, PNG without transparency |
 | `feature-graphic-en-1024x500.png` | Feature graphic (English, default) | 1024 × 500 |
 | `feature-graphic-es-1024x500.png` | Feature graphic (Spanish translation) | 1024 × 500 |
-| `phone/01-controller.png` … `05-settings.png` | Phone screenshots | 2:1 at most |
-| `tablet/01-controller.png` … `04-settings.png` | 7" and 10" tablet screenshots | 16:10 and about 16:9 |
+| `phone/01-controller.png` … `04-home.png` | Phone screenshots | 1920 × 1080 and 1080 × 1920 |
+| `tablet/01-controller.png` … `03-home.png` | 7" and 10" tablet screenshots | 1920 × 1200 |
 
-The screenshots show the real app (Realme 7 5G and Redmi Pad SE) connected to a Windows 11 PC, in English and with the dark theme, taken in the debug build's demo mode so the computer's name shows as "PC". Phone controller shots are padded with the controller background up to 2:1, because Google Play rejects longer screenshots; main-screen shots are cropped to remove the system bars. Nothing inside the app is retouched.
+Each screenshot puts a short English headline over the real app's screen (Realme 7 5G and Redmi Pad SE, connected to a Windows 11 PC) on the caramel background. The app is in English with the dark theme, taken in the debug build's demo mode so the computer's name shows as "PC". Status and navigation bars are cropped out, and nothing inside the app's screen is retouched.
 
 To redo them, with the debug build installed and the PC paired:
 

@@ -115,10 +115,6 @@
     <string name="dead_zone_label">Stick dead zone: %1$d%%</string>
     <string name="fine_center">Finer control near the center</string>
     <string name="sticks_help">The dead zone ignores small thumb movements. With finer control, small movements turn less and a full push still reaches the edge. A bigger stick in Arrange controls also gives more travel.</string>
-    <string name="theme_label">Theme</string>
-    <string name="theme_system">System</string>
-    <string name="theme_light">Light</string>
-    <string name="theme_dark">Dark</string>
-    <string name="name_label">Name on the PC</string>
-    <string name="name_help">Tells several phones apart in Windows Bluetooth settings. Windows picks up a new name the next time the controller connects.</string>
+    <string name="theme_to_dark">Switch to dark theme</string>
+    <string name="theme_to_light">Switch to light theme</string>
 </resources>

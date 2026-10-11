@@ -56,13 +56,13 @@ Probado con la identidad B en `1209:D0CC:0100`:
 
 ## Dos aparatos con DuckPad en el mismo PC
 
-Un móvil y una tablet, los dos con `1209:D0CC`, emparejados a la vez: Windows crea dos mandos HID y SDL los ve como dos mandos (`mando0` y `mando1`). Cada pulsación llega solo al suyo, también pulsando en los dos a la vez. Antes aparecían en Configuración de Windows cuatro entradas «DuckPad», dos por aparato, sin forma de distinguirlas. Ahora el nombre Bluetooth de la sesión es «DuckPad» y el nombre del aparato (editable en Nombre en el PC). Probado en la Redmi Pad SE: tras cerrar la sesión, cambiar el nombre y volver a iniciarla, Windows renombró la entrada del mando a «DuckPad Redmi Pad SE» al reconectar, sin volver a emparejar. La entrada clásica del teléfono conserva el nombre antiguo. El aviso de Swift Pair recorta el nombre a 17 bytes para que quepa en el paquete de anuncio.
+Un móvil y una tablet, los dos con `1209:D0CC`, emparejados a la vez: Windows crea dos mandos HID y SDL los ve como dos mandos (`mando0` y `mando1`). Cada pulsación llega solo al suyo, también pulsando en los dos a la vez. Antes aparecían en Configuración de Windows cuatro entradas «DuckPad», dos por aparato, sin forma de distinguirlas. Ahora el nombre Bluetooth de la sesión es «DuckPad» y el nombre del aparato, sin opción para cambiarlo; si el sistema no da nombre, se usa el modelo. Probado en la Redmi Pad SE: tras cerrar la sesión y volver a iniciarla con el nombre nuevo, Windows renombró la entrada del mando a «DuckPad Redmi Pad SE» al reconectar, sin volver a emparejar. La entrada clásica del teléfono conserva el nombre antiguo. El aviso de Swift Pair recorta el nombre a 17 bytes para que quepa en el paquete de anuncio.
 
 ## Sticks y editor
 
 - **Zona muerta** (5 % por defecto, de 0 a 20 %) radial, y respuesta cuadrática opcional. Medido por winmm en la tablet con stick de 159 px de radio: 6 px de recorrido no mueven el eje, 40 px dan un 21 % (25 % menos la zona muerta, reescalado) y a fondo llega al tope.
 - **Tamaño de cada control** del 60 % al 160 %, por orientación, con pellizco o con − y +. Comprobado con − y + en la tablet; el pellizco no se puede simular con ADB y está sin probar.
-- **Tema** claro, oscuro o el del sistema, solo para la pantalla principal.
+- **Tema**: la pantalla principal sigue al sistema; un botón junto al título cambia entre claro y oscuro, y si la elección coincide con el sistema vuelve a seguirlo. Probado en la tablet.
 
 ## Reconexión lenta
 

@@ -7,7 +7,7 @@ DuckPad turns an Android phone or tablet into a Bluetooth controller for Windows
 - Stick dead zone and an optional finer response near the center.
 - The volume buttons can work as triggers or as any other button.
 - Optional vibration on press.
-- English and Spanish, light and dark theme.
+- English and Spanish; follows the system theme, with a button to switch between light and dark.
 
 Requirements: Android 9 or later with Bluetooth LE that can advertise as a peripheral. Tested on a Realme 7 5G (Android 12) and a Redmi Pad SE (Android 15) with Windows 11.
 
@@ -24,7 +24,7 @@ Don't force-close the app while the PC is connected: if the process dies with th
 
 ## Several phones on one PC
 
-Each phone shows up as a separate controller. In Windows they are named `DuckPad` plus the device name (for example, `DuckPad Redmi Pad SE`), so you can tell them apart in Bluetooth settings. You can change that name under **Name on the PC**; Windows picks it up the next time the controller connects.
+Each phone shows up as a separate controller. In Windows they are named `DuckPad` plus the device name (for example, `DuckPad Redmi Pad SE`), so you can tell them apart in Bluetooth settings. The name is set automatically; Windows picks it up the next time the controller connects, without pairing again.
 
 ## How Windows sees it
 
@@ -69,7 +69,7 @@ $env:DUCKPAD_SIGNING = "C:\path\to\keystore.properties"
 
 `keystore.properties` holds `storeFile`, `storePassword`, `keyAlias` and `keyPassword` and never goes into the repository. Without it, the release build is unsigned. The `staging` variant matches the release build but is signed with the debug key, to test the shrunk code over a debug install.
 
-Debug builds have a demo mode for store screenshots: `adb shell am start -n dev.patotective.duckpad/.MainActivity --ez demo true` switches the app to English and shows "PC" instead of the computer's name; `--ez demo false` turns it off. Release builds ignore it.
+Debug builds have a demo mode for store screenshots: `adb shell am start --activity-single-top -n dev.patotective.duckpad/.MainActivity --ez demo true` switches the app to English and shows "PC" instead of the computer's name; `--ez demo false` turns it off. Release builds ignore it.
 
 PC test tools are in [tools](tools/README.md); store graphics are in [playstore](playstore/README.md).
 
@@ -98,7 +98,7 @@ DuckPad convierte un móvil o una tablet Android en un mando Bluetooth para Wind
 
 **Uso:** toca **Iniciar sesión**; en el PC, pulsa **Conectar** en el aviso de DuckPad o agrégalo desde Configuración > Bluetooth y dispositivos y elige el DuckPad del icono de dos dispositivos. Para terminar, atrás dos veces o **Terminar sesión**. No cierres la app a la fuerza con el PC conectado.
 
-**Varios móviles en un PC:** cada uno sale como un mando aparte, con el nombre `DuckPad` y el del aparato. Se cambia en **Nombre en el PC**, y Windows lo recoge la próxima vez que se conecta el mando.
+**Varios móviles en un PC:** cada uno sale como un mando aparte, con el nombre `DuckPad` y el del aparato. Se pone solo, y Windows lo recoge la próxima vez que se conecta el mando, sin volver a emparejar.
 
 **Compatibilidad:** Windows lo monta como mando HID genérico (DirectInput). Los programas con SDL, como Ryujinx, necesitan la correspondencia de [SDL mapping](#sdl-mapping) hasta que DuckPad esté en la base de datos de SDL; el comando de PowerShell de esa sección la deja puesta para tu usuario. Los juegos que solo aceptan mandos de Xbox lo ven a través de Steam Input para mandos genéricos. La vibración que piden los juegos no llega al móvil.
 

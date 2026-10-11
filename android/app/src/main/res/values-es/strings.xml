@@ -109,10 +109,6 @@
     <string name="dead_zone_label">Zona muerta de los sticks: %1$d %%</string>
     <string name="fine_center">Más precisión cerca del centro</string>
     <string name="sticks_help">La zona muerta ignora los movimientos pequeños del pulgar. Con más precisión, los movimientos cortos giran menos y al empujar a fondo se sigue llegando al tope. Un stick más grande en Colocar controles también da más recorrido.</string>
-    <string name="theme_label">Tema</string>
-    <string name="theme_system">Sistema</string>
-    <string name="theme_light">Claro</string>
-    <string name="theme_dark">Oscuro</string>
-    <string name="name_label">Nombre en el PC</string>
-    <string name="name_help">Sirve para distinguir varios móviles en la configuración Bluetooth de Windows. Windows recoge el nombre nuevo la próxima vez que se conecta el mando.</string>
+    <string name="theme_to_dark">Cambiar al tema oscuro</string>
+    <string name="theme_to_light">Cambiar al tema claro</string>
 </resources>

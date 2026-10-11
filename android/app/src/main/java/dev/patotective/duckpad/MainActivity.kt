@@ -12,8 +12,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.WindowInsets
 import android.widget.*
@@ -85,32 +83,46 @@ class MainActivity : Activity() {
         showSteps()
         bindTheme()
         bindSticks()
-        bindName()
         bindIdentity(savedInstanceState)
         applyInsets()
     }
 
     /**
      * Capturas de la tienda, solo en depuración: `am start -n …/.MainActivity --ez demo true` pone la app en inglés
-     * y oculta el nombre del PC; `--ez demo false` lo quita.
+     * y oculta el nombre del PC; `--ez demo false` lo quita. `--ei theme 0|1|2` fija el tema sin tocar el botón.
      */
     private fun applyDemoExtra(): Boolean {
-        if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE == 0 || !intent.hasExtra("demo")) return false
-        val on = intent.getBooleanExtra("demo", false)
+        if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE == 0) return false
+        var changed = false
+        if (intent.hasExtra("theme")) {
+            val theme = intent.getIntExtra("theme", 0)
+            changed = theme != prefs.theme
+            prefs.theme = theme
+        }
+        if (intent.hasExtra("demo")) {
+            val on = intent.getBooleanExtra("demo", false)
+            changed = changed || on != prefs.demo
+            prefs.demo = on
+        }
+        intent.removeExtra("theme")
         intent.removeExtra("demo")
-        if (prefs.demo == on) return false
-        prefs.demo = on
-        return true
+        return changed
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (applyDemoExtra()) recreate()
+    }
+
+    /** Sigue al sistema hasta que se toca el botón; si la elección coincide con el sistema, vuelve a seguirlo. */
     private fun bindTheme() {
-        val ids = listOf(R.id.theme_system, R.id.theme_light, R.id.theme_dark)
-        findViewById<RadioGroup>(R.id.theme).apply {
-            check(ids[prefs.theme])
-            setOnCheckedChangeListener { _, id ->
-                val theme = ids.indexOf(id)
-                if (theme < 0 || theme == prefs.theme) return@setOnCheckedChangeListener
-                prefs.theme = theme
+        val dark = Look.isDark(this)
+        findViewById<ImageButton>(R.id.theme_toggle).apply {
+            contentDescription = getString(if (dark) R.string.theme_to_light else R.string.theme_to_dark)
+            setOnClickListener {
+                val systemDark = Look.isDark(applicationContext)
+                prefs.theme = if (dark == systemDark) (if (dark) 1 else 2) else 0
                 recreate()
             }
         }
@@ -143,16 +155,6 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun bindName() {
-        findViewById<EditText>(R.id.name_suffix).apply {
-            setText(Look.suffix(this@MainActivity))
-            addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
-                override fun afterTextChanged(s: Editable?) { prefs.nameSuffix = s.toString().trim() }
-            })
-        }
-    }
     private fun bindIdentity(saved: Bundle?) {
         advancedOpen = saved?.getBoolean("advanced_open") ?: false
         val box = findViewById<View>(R.id.advanced_box)
@@ -284,7 +286,6 @@ class MainActivity : Activity() {
         // El servidor GATT ya publicó su identidad: cambiarla con él abierto no llegaría a Windows.
         val identityEditable = !BlePad.sessionOpen && BlePad.idle
         identityFields.forEach { it.isEnabled = identityEditable }
-        findViewById<View>(R.id.name_suffix).isEnabled = identityEditable
         listOf(R.id.identity_slot_a, R.id.identity_slot_b).forEach { findViewById<View>(it).isEnabled = identityEditable }
         findViewById<View>(R.id.identity_save).isEnabled = identityEditable
         findViewById<View>(R.id.identity_reset).isEnabled = identityEditable

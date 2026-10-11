@@ -131,6 +131,8 @@ class LayoutActivity : Activity() {
 
     private fun showSize(scale: Float?) {
         sizeRow.visibility = if (scale == null) View.GONE else View.VISIBLE
+        // Con la fila de tamaño la barra crece y taparía la ayuda, que ya no hace falta con un control elegido.
+        pad.status = if (scale == null) getString(R.string.layout_hint) else ""
         if (scale != null) sizeLabel.text = getString(R.string.size_value, Math.round(scale * 100))
     }
 

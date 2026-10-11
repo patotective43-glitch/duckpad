@@ -94,11 +94,6 @@ class Prefs(context: Context) {
         get() = sp.getBoolean("fine_center", false)
         set(v) = sp.edit().putBoolean("fine_center", v).apply()
 
-    /** Lo que va detrás de «DuckPad» en el nombre Bluetooth, para distinguir varios aparatos en el mismo PC. */
-    var nameSuffix: String?
-        get() = sp.getString("name_suffix", null)
-        set(v) = sp.edit().putString("name_suffix", v).apply()
-
     /** Solo en versiones de depuración: inglés y «PC» en vez del nombre del ordenador, para las capturas de la tienda. */
     var demo: Boolean
         get() = sp.getBoolean("demo", false)
@@ -106,7 +101,6 @@ class Prefs(context: Context) {
 
     companion object {
         const val MAX_DEAD_ZONE = 20
-        const val MAX_SUFFIX = 16
         // PID de pruebas privadas de pid.codes: no es único y no puede salir en una versión publicada.
         val DEFAULT = Identity(0x1209, 0x0001, 0x0100)
     }

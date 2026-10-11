@@ -40,23 +40,6 @@ def fill_black(surface, rect, color):
     surface.fill(color, pygame.Rect(rect))
 
 
-def pad_to_ratio(surface, color, max_ratio=2.0):
-    w, h = surface.get_size()
-    if w >= h and w / h > max_ratio:
-        nh = int(w / max_ratio + 0.999)
-        out = pygame.Surface((w, nh))
-        out.fill(color)
-        out.blit(surface, (0, (nh - h) // 2))
-        return out
-    if h > w and h / w > max_ratio:
-        nw = int(h / max_ratio + 0.999)
-        out = pygame.Surface((nw, h))
-        out.fill(color)
-        out.blit(surface, ((nw - w) // 2, 0))
-        return out
-    return surface
-
-
 def black_columns(surface, x_from, x_to):
     """Width of the pure black strip on the left (camera cutout in landscape)."""
     w, h = surface.get_size()
@@ -74,32 +57,89 @@ def black_rows(surface):
     return y
 
 
-# --- Phone shots (Realme 7 5G, 2400x1080: longer than 2:1, padded with the controller background) ---
-for src, dst in (("phone-controller.png", "01-controller.png"), ("phone-editor.png", "03-editor.png")):
-    s = load(src)
-    strip = black_columns(s, 0, 300)
-    fill_black(s, (0, 0, strip, s.get_height()), PAD_BG)
-    save(pad_to_ratio(s, PAD_BG), OUT / "phone" / dst)
+def rounded(surface, radius):
+    """Copy with rounded corners; the mask is drawn at twice the size for smooth edges."""
+    w, h = surface.get_size()
+    mask = pygame.Surface((w * 2, h * 2), pygame.SRCALPHA)
+    pygame.draw.rect(mask, (255, 255, 255, 255), mask.get_rect(), border_radius=radius * 2)
+    mask = pygame.transform.smoothscale(mask, (w, h))
+    out = pygame.Surface((w, h), pygame.SRCALPHA)
+    out.blit(surface, (0, 0))
+    out.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+    return out
 
-s = load("phone-controller-portrait.png")
-fill_black(s, (0, 0, s.get_width(), black_rows(s)), PAD_BG)
-save(pad_to_ratio(s, PAD_BG), OUT / "phone" / "02-controller-portrait.png")
 
-# Main screen: without the status bar (110 px) and the navigation bar (from y = 2268).
-for src, dst in (("phone-home.png", "04-home.png"), ("phone-settings.png", "05-settings.png")):
-    s = load(src)
-    save(s.subsurface(pygame.Rect(0, 110, s.get_width(), 2268 - 110)).copy(), OUT / "phone" / dst)
+def wrap(font, text, size, room):
+    lines, line = [], ""
+    for word in text.split():
+        trial = (line + " " + word).strip()
+        if font.get_rect(trial, size=size).width > room and line:
+            lines.append(line)
+            line = word
+        else:
+            line = trial
+    return lines + [line]
 
-# --- Tablet shots (Redmi Pad SE, 1920x1200: already within limits) ---
-for src, dst in (("tablet-controller.png", "01-controller.png"), ("tablet-editor.png", "02-editor.png")):
-    s = load(src)
-    # The HyperOS multi-window handle (three dots at the top) isn't part of the app.
-    fill_black(s, (900, 0, 120, 40), PAD_BG)
-    save(s, OUT / "tablet" / dst)
-for src, dst in (("tablet-home.png", "03-home.png"), ("tablet-settings.png", "04-settings.png")):
-    s = load(src)
-    # Without the status bar (48 px) and the translucent navigation strip at the bottom.
-    save(s.subsurface(pygame.Rect(0, 48, s.get_width(), 1115 - 48)).copy(), OUT / "tablet" / dst)
+
+def compose(shot, size, headline, path):
+    """Store screenshot: caramel background, headline on top, the app's screen below with rounded corners."""
+    W, H = size
+    canvas = pygame.Surface(size)
+    canvas.fill(CARAMEL)
+    font = pygame.freetype.Font(str(FONT))
+    margin = round(min(W, H) * 0.07)
+    title = round(min(W, H) * 0.06)
+    lines = wrap(font, headline, title, W - 2 * margin)
+    line_h = round(title * 1.25)
+    for i, text in enumerate(lines):
+        r = font.get_rect(text, size=title)
+        font.render_to(canvas, ((W - r.width) // 2, margin + i * line_h), text, CREAM, size=title)
+    top = margin + len(lines) * line_h + margin // 2
+    room_w, room_h = W - 2 * margin, H - top - margin
+    k = min(room_w / shot.get_width(), room_h / shot.get_height())
+    scaled = pygame.transform.smoothscale(shot, (round(shot.get_width() * k), round(shot.get_height() * k)))
+    canvas.blit(rounded(scaled, round(min(scaled.get_size()) * 0.045)), ((W - scaled.get_width()) // 2, top))
+    save(canvas, path)
+
+
+def have(*names):
+    return all((RAW / n).exists() for n in names)
+
+
+LANDSCAPE, PORTRAIT, TABLET = (1920, 1080), (1080, 1920), (1920, 1200)
+
+# --- Phone (Realme 7 5G, 2400x1080) ---
+if have("phone-controller.png", "phone-editor.png", "phone-controller-portrait.png", "phone-home.png"):
+    for src, dst, headline in (
+        ("phone-controller.png", "01-controller.png", "Use your phone as a PC controller"),
+        ("phone-editor.png", "02-editor.png", "Move and resize every control"),
+    ):
+        s = load(src)
+        # The camera cutout leaves a black strip on the left.
+        fill_black(s, (0, 0, black_columns(s, 0, 300), s.get_height()), PAD_BG)
+        compose(s, LANDSCAPE, headline, OUT / "phone" / dst)
+    s = load("phone-controller-portrait.png")
+    fill_black(s, (0, 0, s.get_width(), black_rows(s)), PAD_BG)
+    compose(s, PORTRAIT, "Play in landscape or portrait", OUT / "phone" / "03-controller-portrait.png")
+    # Main screen without the status bar (110 px) and the navigation bar (from y = 2268).
+    s = load("phone-home.png")
+    s = s.subsurface(pygame.Rect(0, 110, s.get_width(), 2268 - 110)).copy()
+    compose(s, PORTRAIT, "No PC software needed", OUT / "phone" / "04-home.png")
+
+# --- Tablet (Redmi Pad SE, 1920x1200) ---
+if have("tablet-controller.png", "tablet-editor.png", "tablet-home.png"):
+    for src, dst, headline in (
+        ("tablet-controller.png", "01-controller.png", "Use your tablet as a PC controller"),
+        ("tablet-editor.png", "02-editor.png", "Move and resize every control"),
+    ):
+        s = load(src)
+        # The HyperOS multi-window handle (three dots at the top) isn't part of the app.
+        fill_black(s, (900, 0, 120, 40), PAD_BG)
+        compose(s, TABLET, headline, OUT / "tablet" / dst)
+    s = load("tablet-home.png")
+    # Without the status bar (48 px) and the navigation strip at the bottom.
+    s = s.subsurface(pygame.Rect(0, 48, s.get_width(), 1115 - 48)).copy()
+    compose(s, TABLET, "No PC software needed", OUT / "tablet" / "03-home.png")
 
 
 # --- Icon: the app's adaptive icon (108 canvas) with its visible 72 area scaled to 512 px ---

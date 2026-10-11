@@ -16,7 +16,7 @@ Only in the app's private storage, with no copy on any server:
 
 - control positions, sizes and settings;
 - the Bluetooth address of computers that used the controller, to reconnect automatically;
-- the phone's Bluetooth name while a session is open, to restore it afterwards. During a session the phone is named "DuckPad" plus the device name, which you can change under Name on the PC.
+- the phone's Bluetooth name while a session is open, to restore it afterwards. During a session the phone is named "DuckPad" plus the device name.
 
 Everything is deleted when the app is uninstalled or its data is cleared in Android Settings.
 
@@ -48,7 +48,7 @@ Solo en el almacenamiento privado de la app, sin copia en ningún servidor:
 
 - las posiciones y tamaños de los controles y los ajustes;
 - la dirección Bluetooth de los ordenadores que han usado el mando, para reconectar sola;
-- el nombre Bluetooth del móvil mientras dura la sesión, para devolvérselo al terminar. Durante la sesión el móvil se llama «DuckPad» y el nombre del aparato, que se puede cambiar en Nombre en el PC.
+- el nombre Bluetooth del móvil mientras dura la sesión, para devolvérselo al terminar. Durante la sesión el móvil se llama «DuckPad» y el nombre del aparato.
 
 Se borra todo al desinstalar la app o al borrar sus datos en Ajustes de Android.
 
